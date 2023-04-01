@@ -663,32 +663,5 @@ Page({
                 });
             }
         })
-    },
-    handleTcp() {
-        const tcp = wx.createTCPSocket()
-        tcp.connect({
-            address: '59.82.113.18',
-            port: 443
-        })
-        tcp.onConnect(() => {
-            console.log("onConnect")
-            tcp.write('hello, how are you')
-        })
-        tcp.onMessage((message, remoteInfo, localInfo) => {
-            console.log("onMessage")
-            console.log(message)
-            console.log(remoteInfo)
-            console.log(localInfo)
-        })
-        tcp.onError((res) => {
-            console.log(res)
-        })
-
-        setTimeout(function () {
-            // 3s后，关闭socket
-            tcp.close(() => {
-                console.log("close")
-            })
-        }, 3000)
     }
 })
