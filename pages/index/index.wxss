@@ -1,0 +1,14 @@
+/**index.wxss**/
+.button{
+    display: inline-block;
+    width: 50%
+}
+.popTitle{
+    height: 35px;
+}
+.progress{
+    height: 12px;
+}
+.textField{
+    margin: 15px;
+}

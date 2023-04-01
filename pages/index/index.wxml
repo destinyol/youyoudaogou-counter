@@ -1,0 +1,71 @@
+<!--index.wxml-->
+<wxs module="filters" src="./util/filter.wxs"></wxs>
+<van-dialog id="van-dialog" />
+<view>
+    <van-toast id="van-toast" />
+    <van-popup show="{{ show }}" custom-style="width: 95%;height:80%" closeable bind:close="onClose">
+        <van-cell title="历史记录（最多250条，每天一条）" />
+        <table columns="{{columns}}" dataList="{{history}}"></table>
+    </van-popup>
+    <van-popup show="{{ showInfo }}" custom-style="width: 90%" closeable bind:close="onInfoClose">
+        <van-cell title="使用说明" />
+        <van-cell-group inset>
+            <van-cell title="参数介绍: 总成本" label="便于计算用户已赚多少钱，已赚=钱包余额+总市值-总成本，非必要参数" />
+            <van-cell title="参数介绍: 忽略价格" label="忽略多少钱以下的饰品，用于过滤几毛钱几分钱的饰品，若要统计全部请输入0，非必要参数" />
+        </van-cell-group>
+    </van-popup>
+    <van-popup show="{{ showLogin }}" custom-style="width: 90%" closeable bind:close="onLoginClose" round>
+        <van-cell title="登录" />
+        <van-field model:value="{{ phoneNum }}" required label="手机号" placeholder="请输入用户名" />
+        <van-field model:value="{{ loginCode }}" required label="验证码" placeholder="请输入验证码">
+            <van-button slot="button" size="small" type="primary" bind:click="getLoginCode" use-button-slot>
+                获取验证码
+            </van-button>
+        </van-field>
+        <van-button size="large" type="info" bind:click="checkLoginCode">
+                登录
+        </van-button>
+    </van-popup>
+    <van-cell-group>
+        <van-cell title="{{'用户：'+userName}}" icon="user-o" label="{{'手机号：'+phoneNum}}">
+            <van-button slot="right-icon" size="small" wx:if="{{!loginIned}}" type="primary" bind:click="showLoginPopup">
+                登录
+            </van-button>
+            <van-button slot="right-icon" size="small" type="primary" wx:if="{{loginIned}}" bind:click="loginOutConfirm">
+                退出登录
+            </van-button>
+        </van-cell>
+        <van-field value="{{totalCost}}" label="总成本" placeholder="请输入总成本" bind:change="onChangeTotalCost">
+            <van-button slot="button" size="small" type="primary" bind:click="showInfoPopup" use-button-slot>
+                使用说明
+            </van-button>
+        </van-field>
+        <van-field value="{{ ignoreNum }}" label="忽略价格" placeholder="请输入忽略的价格下限" bind:change="onChangeIgnoreNum" />
+        <van-button type="primary" size="large" class="button" bindtap="initToken" wx:if="{{requestIng==0}}">刷新</van-button>
+        <van-button type="primary" size="large" class="button" loading wx:if="{{requestIng==1}}" loading-text="获取中..."></van-button>
+        <van-button type="info" size="large" class="button" bind:click="showPopup">历史记录</van-button>
+    </van-cell-group>
+    <van-divider customStyle="height:12px; font-size: 12px;" contentPosition="center">如遇请求失败等bug，请刷新或重启小程序</van-divider>
+    <view class="progress">
+        <van-progress percentage="{{progress}}" />
+    </view>
+    <van-cell-group>
+        <van-cell title="{{'总市值：'+filters.toFix(totalMoney)}}" value="{{'钱包余额：'+filters.toFix(walletMoney)}}" size="large" />
+        <van-cell title="{{'总金额：'+filters.toFix((totalMoney+walletMoney))}}" value="{{'已赚：'+filters.toFix((totalMoney+walletMoney-totalCost))}}" size="large">
+            <van-icon name="arrow-up" slot="right-icon" color="red" wx:if="{{lastMoneyCheck==1}}" />
+            <van-icon name="arrow-down" slot="right-icon" color="green" wx:if="{{lastMoneyCheck==2}}" />
+            <van-icon name="minus" slot="right-icon" wx:if="{{lastMoneyCheck==0}}" />
+        </van-cell>
+        <van-divider customStyle="height:6px; font-size: 12px;" contentPosition="center" wx:if="{{(totalMoney+walletMoney)>=200}}">{{'扣除悠悠提现1%手续费已赚：'+filters.toFix(((totalMoney+walletMoney)*0.99)-totalCost)}}</van-divider>
+        <van-divider customStyle="height:6px; font-size: 12px;" contentPosition="center" wx:if="{{(totalMoney+walletMoney)<200}}">{{'扣除悠悠提现1%手续费已赚：'+filters.toFix((totalMoney+walletMoney)-totalCost-2)}}</van-divider>
+        <van-cell title="饰品名称" value="最低市场价" size="large" icon="shop-o" />
+        <view wx:for="{{ itemList }}" wx:for-index="idx" wx:for-item="item">
+            <van-cell title="{{item.name}}" center value="{{item.price}}" label="{{item.label}}" size="large">
+                <van-icon name="arrow-up" slot="right-icon" color="red" wx:if="{{item.upOrDown==1}}" />
+                <van-icon name="arrow-down" slot="right-icon" color="green" wx:if="{{item.upOrDown==2}}" />
+                <van-icon name="minus" slot="right-icon" wx:if="{{item.upOrDown==0}}" />
+            </van-cell>
+        </view>
+    </van-cell-group>
+    <van-notify id="van-notify" />
+</view>

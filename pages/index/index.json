@@ -1,0 +1,5 @@
+{
+  "usingComponents": {
+      "table": "/pages/index/util/tableComponent/table/table"
+  }
+}
